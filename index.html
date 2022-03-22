@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="light">
+
+  <head>
+    <base target="_top" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+    <script async src="https://cdn.jsdelivr.net/gh/FortAwesome/Font-Awesome@6/js/all.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/picocss/pico@1/css/pico.min.css" />
+    <style>
+      #lightdarktoggle {
+        cursor: pointer;
+      }
+
+      /* https://github.com/picocss/pico/issues/171 */
+      .container > article > header {
+        margin-bottom: 0;
+        border-bottom: 0;
+      }
+      .container > article > footer {
+        margin-top: 0;
+        border-top: 0;
+      }
+      .container > article > form {
+        margin: var(--block-spacing-vertical) 0;
+      }
+
+      #suggestions > span {
+        margin: 0 8px 8px 0;
+      }
+    </style>
+
+    <style>
+      /**
+      * Button group. Hopefully merged soon and will become unnecessary.
+      * https://github.com/picocss/pico/pull/164/files
+      */
+      div[role=group] {
+        display: flex;
+        flex-direction: column;
+      }
+
+      @media (min-width: 575px) {
+        div[role=group] {
+          flex-direction: row;
+        }
+        div[role=group] > button {
+          border-radius: 0;
+        }
+        div[role=group] > button:first-child {
+          border-radius: var(--border-radius) 0 0 var(--border-radius);
+        }
+        div[role=group] > button:last-child {
+          border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+      }
+    </style>
+
+    <?!= include('sample-config'); ?>
+
+  </head>
+
+  <body>
+
+    <dialog>
+      <article>
+        <h4 id="modaltitle"><span class="fa-solid fa-calendar-check"></span> Event scheduled!</h4>
+        <p id="modaltext">
+          Thanks for signing up. Check your email for confirmation!
+        </p>
+        <footer>
+          <a id="seeEvent" role="button" target="_blank">See Event on Your Calendar</a>
+          <span id="closeModal" role="button" class="secondary">Close</span>
+        </footer>
+      </article>
+    </dialog>
+
+    <nav class="container">
+      <ul>
+        <li>
+          <a id="calendarlink" target="_blank">
+            <span class="fa-solid fa-calendar-plus"></span>
+            <span id="calendarname">Choose an Event Type</span>
+          </a>
+        </li>
+      </ul>
+      <ul>
+        <li id="lightdarktoggle"><span class="fa-solid fa-moon"></span></li>
+      <ul>
+    </nav>
+
+    <div class="container">
+      <article>
+
+        <header id="typegroup">
+          <div id="type" role="group"></div>
+        </header>
+        
+        <form style="display:none">
+
+          <h1 id="typetitle" class="card-title"></h1>
+
+          <label for="email"><span class="fa-solid fa-envelope fa-fw"></span> Your Email</label>
+          <input id="email" type="email" required>
+
+          <div id="suggestionscontainer" style="display:none;margin-bottom:var(--spacing);">
+            <label for="suggestions" style="opacity:0.5"><span id="suggestionsicon" class="fa-solid fa-wand-magic-sparkles fa-fw"></span> Suggested Times</label>
+            <figure id="suggestions" style="white-space:nowrap"></figure>
+          </div>
+
+          <div class="grid">
+
+            <div>
+              <label for="date"><span class="fa-solid fa-calendar-day fa-fw"></span> What day?</label>
+              <input id="date" type="date" required>
+              <small id="timehelp"></small>
+            </div>
+
+            <div>
+              <label for="starttime"><span class="fa-solid fa-clock fa-fw"></span> What time?</label>
+              <input id="starttime" type="time" required>
+              <small id="timezone">Loading...</small>
+            </div>
+
+            <div>
+              <label for="length"><span class="fa-solid fa-hourglass fa-fw"></span> How long?</label>
+              <select id="length" required>
+                <option>Loading...</option>
+              </select>
+            </div>
+
+          </div>
+
+          <label for="title"><span class="fa-solid fa-circle-info fa-fw"></span> <span id="titlelabel">Event Name</span></label>
+          <input id="title" type="text" required>
+
+          <label for="location"><span class="fa-solid fa-map-location fa-fw"></span> <span id="locationlabel">Location</span></label>
+          <input id="location" type="text" required>
+          
+          <div id="virtualcontainer">
+            <label for="virtual" style="margin-bottom:var(--spacing)">
+              <input id="virtual" type="checkbox" role="switch" value="true">
+              Virtual meeting?
+            </label>
+          </div>
+
+          <label for="description"><span class="fa-solid fa-align-left fa-fw"></span> <span id="descriptionlabel">Description</span></label>
+          <textarea id="description"></textarea>
+
+          <div id="additionalguestscontainer">
+            <label for="additionalguests"><span class="fa-solid fa-user-plus fa-fw"></span> Additional Guests</label>
+            <input id="additionalguests" type="email" multiple="true">
+            <small>Comma-separated list of email addresses</small>
+          </div>
+
+          <button id="submit" role="submit">Schedule</button>
+
+        </form>
+
+        <footer><small>Powered by <a href="https://schedule.quest/" target="_blank">ScheduleQuest</small></footer>
+
+      </article>
+    </div>
+
+  </body>
+
+  <script>
+    function $(a) {
+      if (a.startsWith('#')) return document.getElementById(a.slice(1));
+      if (a.startsWith('.')) return document.getElementsByClassName(a.slice(1));
+      return document.querySelectorAll(a);
+    }
+
+    function lightDarkToggle(event) {
+      if (event) event.preventDefault();
+      if (document.documentElement.dataset.theme === 'dark') {
+        document.documentElement.dataset.theme = 'light';
+        $('#lightdarktoggle').innerHTML = '<span class="fa-solid fa-moon"></span>';
+      } else {
+        document.documentElement.dataset.theme = 'dark';
+        $('#lightdarktoggle').innerHTML = '<span class="fa-solid fa-sun"></span>';
+      }
+    }
+
+    function loadMeetingTypes() {
+      for (let type in meetingTypes) {
+        let button = document.createElement('button');
+        // button.setAttribute('role', 'button');
+        button.id = type;
+        button.autocomplete = 'off';
+        button.innerHTML = '<span class="' + meetingTypes[type]['icon'] + ' fa-xl"></span><br />' + meetingTypes[type]['name'];
+        button.addEventListener('click', () => {toggleMeetingType(type)});
+        $('#type').append(button);
+        if (Object.keys(meetingTypes).length === 1) {
+          toggleMeetingType(type);
+          $('#typegroup').style.display = 'none';
+        }
+      }
+    }
+
+    function toggleMeetingType(newType) {
+
+      $('form')[0].style.display = 'block'; // unhide form in case this is first toggle after pageload
+
+      let type = meetingTypes[newType];
+
+      if ($('#email').value) checkForSuggestions(); // refresh since the meeting length might have changed
+
+      google.script.run.withSuccessHandler(calendar => {
+        $('#calendarlink').href = 'https://calendar.google.com/calendar/?cid=' + calendar.id;
+        $('#calendarname').innerText = 'Scheduling with ' + calendar.summary;
+        $('#timezone').innerText = 'Scheduling in ' + calendar.timeZone + ' timezone';
+        $('#timezone').dataset.timezone = calendar.timeZone;
+      }).withFailureHandler(() => $('#calendarname').innerText = '⚠️ Error: Please reload').getCalendar(type['scheduleOn']);
+
+      $('#typetitle').innerText = type['name'];
+      $('#typetitle').dataset.type = newType;
+      
+      let min = new Date();
+      min.setMinutes(min.getMinutes() + type['minMinutesFromNow']); // TODO: This is not in owner's timezone?
+      while (type['daysToExclude'].includes(min.getDay())) { // find this or next day not in exclusions
+        min.setDate(min.getDate() + 1);
+      }
+      $('#date').min = min.toISOString().split('T')[0];
+      $('#date').value = min.toISOString().split('T')[0];
+      
+      let lastDay = new Date();
+      lastDay.setDate(lastDay.getDate() + type['maxDaysFromNow']);
+      $('#date').max = lastDay.toISOString().split('T')[0];
+
+      $('#starttime').value = '';
+      $('#starttime').min = type['timeMin'];
+      $('#starttime').max = type['timeMax'];
+      $('#starttime').step = type['timeStep'];
+
+      $('#length').innerHTML = '';
+      for (let length of type['length']) {
+        let option = document.createElement('option');
+        option.value = length;
+        option.innerText = length + ' Minutes';
+        $('#length').append(option);
+      }
+      $('#length').disabled = type['length'].length === 1;
+
+      $('#titlelabel').innerText = type['titleLabel'];
+      $('#title').value = '';
+      $('#title').disabled = type['titleReadOnly'];
+
+      $('#locationlabel').innerText = type['locationLabel'];
+      $('#location').value = type['preferVirtual'] ? 'Google Meet' : '';
+      $('#location').disabled = type['preferVirtual'] ? true : type['locationReadOnly'];
+
+      $('#virtualcontainer').style.display = type['allowVirtual'] ? 'block' : 'none';
+      $('#virtual').disabled = type['locationReadOnly'];
+      $('#virtual').checked = type['preferVirtual'];
+
+      $('#descriptionlabel').innerText = type['descriptionLabel'];
+      $('#description').value = type['description'];
+      $('#description').disabled = type['descriptionReadOnly'];
+
+      $('#additionalguestscontainer').style.display = type['otherguests'] ? 'block' : 'none';
+      $('#additionalguests').value = '';
+
+      validateDateAndTime();
+
+    }
+
+    function checkForSuggestions() {
+      console.log('Checking for suggested times...');
+      $('#suggestions').innerHTML = '';
+      $('#suggestionsicon').classList.add('fa-bounce');
+      console.info('Checking for suggestions with ' + $('#email').value);
+      let type = meetingTypes[$('#typetitle').dataset.type];
+      google.script.run.withSuccessHandler(populateSuggestions).withFailureHandler(hideSuggestions).getSuggestedTimes(type['scheduleOn'], $('#email').value, $('#length').value, type['timeStep'], type['timeMin'], type['timeMax'], type['daysToExclude'], type['minMinutesFromNow'], type['maxDaysFromNow']);
+    }
+
+    function populateSuggestions(suggestions) {
+      console.log('Suggestions:');
+      console.table(suggestions);
+      $('#suggestions').innerHTML = '';
+      if (!suggestions || !suggestions.length) {
+        $('#suggestionscontainer').style.display = 'none';
+        return;
+      }
+      for (let suggestion of suggestions) {
+        let button = document.createElement('span');
+        button.setAttribute('role', 'button');
+        button.className = 'secondary';
+        button.addEventListener('click', () => { setDateAndTime(suggestion['value']) });
+        button.innerHTML = '<span class="fa-solid fa-user-clock fa-fw"></span> ' + suggestion['display'];
+        $('#suggestions').append(button);
+      }
+      $('#suggestionscontainer').style.display = 'block';
+      $('#suggestionsicon').classList.remove('fa-bounce');
+    }
+
+    function hideSuggestions(error) {
+      console.error('Problem finding suggestions ' + error.message);
+      $('#suggestionscontainer').style.display = 'none';
+      $('#suggestionsicon').classList.remove('fa-bounce');
+      $('#suggestions').innerHTML = '';
+    }
+
+    function setDateAndTime(datetime) {
+      $('#date').value = datetime.split('T')[0];
+      $('#starttime').value = datetime.split('T')[1];
+      validateDateAndTime();
+    }
+
+    function setSubmitToLoading() {
+      $('#submit').disabled = true;
+      $('#submit').setAttribute('aria-busy', true);
+    }
+
+    function validateDateAndTime() {
+      console.log('Checking if time is valid...');
+      $('#date').setAttribute('aria-invalid', '');
+      $('#starttime').setAttribute('aria-invalid', '');
+      $('#submit').disabled = 'true';
+      $('#timehelp').innerText = '';
+      let type = meetingTypes[$('#typetitle').dataset.type];
+      if (!$('#date').value || !$('#starttime').value) {
+        console.warn('Never mind, missing a date/time/length');
+        $('#date').setAttribute('aria-invalid', !$('#date').value);
+        $('#starttime').setAttribute('aria-invalid', !$('#starttime').value);
+        $('#timehelp').innerText = 'Please choose a day and time.';
+        $('#submit').innerText = 'Please Choose a Day/Time';
+        return;
+      }
+      if ($('#starttime').value < type['timeMin'] || $('#starttime').value > type['timeMax']) {
+        console.error('Time is outside min/max');
+        $('#timehelp').innerText = 'Sorry, that time is too early/too late in the day. Please choose another time.';
+        $('#starttime').setAttribute('aria-invalid', 'true');
+        $('#submit').innerText = 'Please Choose a Different Time';
+        return;
+      }
+      $('#submit').setAttribute('aria-busy', 'true');
+      $('#submit').innerText = 'Checking Availability...';
+      $('label[for="date"]')[0].setAttribute('aria-busy', 'true');
+      $('#date').setAttribute('aria-busy', 'true');
+      $('label[for="starttime"]')[0].setAttribute('aria-busy', 'true');
+      $('#starttime').setAttribute('aria-busy', 'true');
+      google.script.run.withSuccessHandler(confirmValidTime).withFailureHandler(problemValidatingTime).getAvailability(type['busyAgainst'], $('#email').value, $('#date').value, $('#starttime').value, $('#length').value, type['minMinutesFromNow'], type['maxDaysFromNow'], type['daysToExclude']);
+    }
+
+    function confirmValidTime(freebusy) {
+      console.log('Time is valid: ' + JSON.stringify(freebusy));
+      $('#date').setAttribute('aria-invalid', freebusy['busy']);
+      $('#starttime').setAttribute('aria-invalid', freebusy['busy']);
+      $('#timehelp').innerText = freebusy['busy'] ? 'Sorry, this calendar is busy at that time. Please choose another time.' : freebusy['guestBusy'] ? 'Are you sure? That works for me, but it looks like your calendar might be busy at that time.' : '';
+      $('#submit').disabled = freebusy['busy'];
+      $('#submit').setAttribute('aria-busy', 'false');
+      $('#submit').innerText = freebusy['busy'] ? 'Please Choose a Different Day/Time' : 'Submit';
+      $('label[for="date"]')[0].setAttribute('aria-busy', 'false');
+      $('#date').setAttribute('aria-busy', 'false');
+      $('label[for="starttime"]')[0].setAttribute('aria-busy', 'false');
+      $('#starttime').setAttribute('aria-busy', 'false');
+      if (meetingTypes[$('#typetitle').dataset.type]['allowVirtual']) confirmRemoteWorkStatus();
+    }
+
+    function problemValidatingTime(error) {
+      console.error('Problem validating time: ' + error.message);
+      $('#date').setAttribute('aria-invalid', 'true');
+      $('#starttime').setAttribute('aria-invalid', 'true')
+      $('#timehelp').innerText = error.message;
+      $('#submit').disabled = 'true';
+      $('#submit').setAttribute('aria-busy', 'false');
+      $('#submit').innerText = 'Choose a Different Day/Time';
+      $('label[for="date"]')[0].setAttribute('aria-busy', 'false');
+      $('#date').setAttribute('aria-busy', 'false');
+      $('label[for="starttime"]')[0].setAttribute('aria-busy', 'false');
+      $('#starttime').setAttribute('aria-busy', 'false');
+    }
+
+    function confirmRemoteWorkStatus() {
+      console.log('Checking remote status...');
+      google.script.run.withSuccessHandler(toggleForceRemoteMeeting).withFailureHandler(toggleForceRemoteMeeting).getRemoteWorkStatus(meetingTypes[$('#typetitle').dataset.type]['scheduleOn'], $('#date').value, $('#starttime').value, $('#length').value);
+    }
+
+    function toggleForceRemoteMeeting(remoteStatus) {
+      console.log('Remote status is ' + remoteStatus);
+      if (remoteStatus instanceof Error) {
+        $('#location').value = '';
+        $('#location').disabled = false;
+        $('#virtual').checked = false;
+        $('#virtual').disabled = false;
+      } else if (remoteStatus) {
+        $('#location').value = 'Google Meet';
+        $('#location').disabled = true;
+        $('#virtual').checked = true;
+        $('#virtual').disabled = true;
+      } else { // i'm not remote, their choice
+        if (meetingTypes[$('#typetitle').dataset.type]['preferVirtual']) {
+          $('#location').value = 'Google Meet';
+          $('#location').disabled = true;
+          $('#virtual').checked = true;
+          $('#virtual').disabled = false;
+        } else {
+          $('#location').value = '';
+          $('#location').disabled = false;
+          $('#virtual').checked = false;
+          $('#virtual').disabled = false;
+        }
+      }
+    }
+
+    function submit(e) {
+      e.preventDefault();
+      let type = meetingTypes[$('#typetitle').dataset.type];
+      let guests = $('#email').value;
+      if ($('#additionalguests').value) guests += ',' + $('#additionalguests').value;
+      let title = type['title'].replace('{INPUT}', $('#title').value);
+      let location = type['location'].replace('{INPUT}', $('#location').value);
+      let description = type['description'].replace('{INPUT}', $('#description').value);
+      let virtual = type['allowVirtual'] ? $('#virtual').value : false;
+      $('#submit').disabled = true;
+      $('#submit').setAttribute('aria-busy', 'true');
+      google.script.run.withSuccessHandler(confirmSchedule).withFailureHandler(errorScheduling).scheduleEvent(type['scheduleOn'], guests, title, location, description, $('#date').value, $('#starttime').value, $('#length').value, virtual, type['sendEmailInvitation'], type['webhookUrl']);
+    }
+
+    function confirmSchedule(details) {
+      $('#submit').disabled = false;
+      $('#submit').removeAttribute('aria-busy');
+      $('#modaltitle').innerText = '<span class="fa-solid fa-calendar-check"></span> Event scheduled!';
+      $('#modaltext').innerText = 'Thanks for signing up. Check your email for confirmation!';
+      $('#seeEvent').style.display = 'inline';
+      $('#seeEvent').href = details.htmlLink;
+      $('dialog')[0].setAttribute('open', true);
+    }
+
+    function errorScheduling(error) {
+      $('#submit').disabled = false;
+      $('#submit').removeAttribute('aria-busy');
+      $('#modaltitle').innerText = '<span class="fa-solid fa-calendar-xmark"></span> Error Scheduling Event';
+      $('#modaltext').innerText = 'Sorry, a problem came up while scheduling your event: ' + error.message;
+      $('#seeEvent').style.display = 'none';
+      $('#seeEvent').href = '';
+      $('dialog')[0].setAttribute('open', true);
+    }
+
+    document.addEventListener('DOMContentLoaded', event => {
+
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) lightDarkToggle();
+      $('#lightdarktoggle').addEventListener('click', lightDarkToggle);
+
+      loadMeetingTypes();
+
+      google.script.url.getLocation(location => {
+        if (location.parameter.type && location.parameter.type in meetingTypes) toggleMeetingType(location.parameter.type);
+        if (location.parameter.email) {
+          $('#email').value = location.parameter.email;
+          checkForSuggestions();
+        }
+        if (location.parameter.title) $('#title').value = location.parameter.title;
+      });
+
+      $('form')[0].addEventListener('submit', submit);
+      $('#closeModal').addEventListener('click', () => $('dialog')[0].removeAttribute('open'));
+
+      var lastEmailChange;
+      $('#email').addEventListener('keyup', () => {
+        $('#suggestionscontainer').style.display = 'none';
+        clearInterval(lastEmailChange);
+        lastEmailChange = setInterval(() => {
+          checkForSuggestions();
+          clearInterval(lastEmailChange);
+        }, 1000);
+      });
+      $('#length').addEventListener('change', () => {
+        $('#suggestionscontainer').style.display = 'none';
+        clearInterval(lastEmailChange);
+        checkForSuggestions();
+      });
+
+      var lastTimeChange;
+      [$('#email'), $('#date'), $('#starttime'), $('#length')].forEach(x => x.addEventListener('change', () => {
+        clearInterval(lastTimeChange);
+        lastTimeChange = setInterval(() => {
+          validateDateAndTime();
+          clearInterval(lastTimeChange);
+        }, 1000);
+      }));
+      
+      $('#virtual').addEventListener('change', (event) => {
+        if (event.currentTarget.checked) {
+          $('#location').value = 'Google Meet';
+          $('#location').disabled = true;
+        } else {
+          $('#location').value = '';
+          $('#location').disabled = false;
+        }
+      });
+
+    });
+  </script>
+
+</html>
