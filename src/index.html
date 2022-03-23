@@ -411,11 +411,10 @@
       if ($('#additionalguests').value) guests += ',' + $('#additionalguests').value;
       let title = type['title'].replace('{INPUT}', $('#title').value);
       let location = type['location'].replace('{INPUT}', $('#location').value);
-      let description = type['description'].replace('{INPUT}', $('#description').value);
       let virtual = type['allowVirtual'] ? $('#virtual').value : false;
       $('#submit').disabled = true;
       $('#submit').setAttribute('aria-busy', 'true');
-      google.script.run.withSuccessHandler(confirmSchedule).withFailureHandler(errorScheduling).scheduleEvent(type['scheduleOn'], guests, title, location, description, $('#date').value, $('#starttime').value, $('#length').value, virtual, type['sendEmailInvitation'], type['webhookUrl']);
+      google.script.run.withSuccessHandler(confirmSchedule).withFailureHandler(errorScheduling).scheduleEvent(type['scheduleOn'], guests, title, location, $('#description').value, $('#date').value, $('#starttime').value, $('#length').value, virtual, type['sendEmailInvitation'], type['webhookUrl']);
     }
 
     function confirmSchedule(details) {
