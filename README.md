@@ -15,10 +15,13 @@
 - 📒 Place events on any calendar you have edit access to
 - 📆 Confirm availability against multiple calendars
 - 🤖 Intelligent suggestion of available free times on both your and (if accessible) the scheduling party's calendar
+- 🔗 URL parameters to bring the user to a specific meeting type and prefill their email[<sup>1</sup>](#url-parameters)
 - ⚡ Send a webhook push to integrate with [IFTTT](https://ifttt.com/maker_webhooks), [Zapier](https://zapier.com/page/webhooks/), and more when an event is scheduled
 - 🌈 Configurable accent color
 - 🌙 Automatic light and dark mode
 - 💳 No premium tier. 100% free.
+
+<small id="url-parameters">1. For example: `https://script.google.com/macros/s/{ID}/exec?type=sales&email=customer@example.com`</small>
 
 ## Setup
 
@@ -28,7 +31,7 @@ Making your own ScheduleQuest page is easy!
 2. Click `Services ➕` in the left sidebar, scroll down to and select `Google Calendar API`, and click `Add`.
 3. Copy and paste the three files from [the `src` folder](https://github.com/leoherzog/ScheduleQuest/blob/main/src/) in this repository into three files in your Apps Script project named `Code.gs`, `index.html`, `config.html`.
 4. Customize the `config.html` file to contain the types of meetings you want to offer. Details are available in [the configuration section below](#configuration).
-5. Click `Deploy ⏷` in the top right, then `New Deployment`. Change the `Who Has Access` dropdown to whomever you want to be able to schedule events, and click `Deploy`.
+5. Click `Deploy ⏷` in the top right, then `New Deployment`. Change the `Who Has Access` dropdown to whomever you want to be able to access your scheduling page, then click `Deploy`.
 
 Apps Script will then show you a deployment "Web App" URL that you can copy to the clipboard. This is the link to distribute to your recipients!
 
