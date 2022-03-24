@@ -425,6 +425,7 @@
       $('#seeEvent').style.display = 'inline';
       $('#seeEvent').href = details.htmlLink;
       $('dialog')[0].setAttribute('open', true);
+      toggleMeetingType(meetingTypes[$('#typetitle').dataset.type]);
     }
 
     function errorScheduling(error) {
