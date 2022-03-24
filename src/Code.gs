@@ -23,14 +23,14 @@ function scheduleEvent(myId, theirIds, title, location, description, date, time,
   
   eval(getLuxon_());
 
-  let myTimezone = Calendar.Calendars.get(myId).timeZone;
+  const myTimezone = getCalendar(myId).timeZone;
   let start = luxon.DateTime.fromISO(date + 'T' + time + ':00.000').setZone(myTimezone);
   let end = start.plus({"minutes": length});
 
-  console.log(JSON.stringify(Calendar.Calendars.get(myId)));
+  console.log(JSON.stringify(getCalendar(myId)));
 
   let attendees = [];
-  attendees.push({"email": Session.getActiveUser().getEmail()});
+  attendees.push({"email": myId.toLowerCase().trim() === 'primary' ? getCalendar(myId).id : myId});
   attendees = attendees.concat(theirIds.split(',').map(e => ({"email": e})));
   
   let assembledDetails = {
@@ -64,7 +64,7 @@ function scheduleEvent(myId, theirIds, title, location, description, date, time,
 
   let event = Calendar.Events.insert(assembledDetails, myId, {"conferenceDataVersion": 1, "sendNotifications": sendEmailInvitation});
   
-  MailApp.sendEmail(Session.getActiveUser().getEmail(), 'New ScheduleQuest Event', 'Name: ' + event.summary + '\n' + event.htmlLink);
+  MailApp.sendEmail(getCalendar('primary').id, 'New ScheduleQuest Event', 'Name: ' + event.summary + '\n' + event.htmlLink);
 
   if (webhookUrl) {
     try {
@@ -78,17 +78,17 @@ function scheduleEvent(myId, theirIds, title, location, description, date, time,
       console.error(e.message);
     }
   }
-  
-  console.log(JSON.stringify(event));
 
   checkGithubReleaseVersion_();
+  
+  console.log(JSON.stringify(event));
   
   return event;
   
 }
 
 function testGetAvailability() {
-  getAvailability(["primary", "example.com_saj4co1nm5kyh8qs440fssktx4@group.calendar.google.com"], 'name@example.com', '2022-03-21', '09:30', '30', '240', '60');
+  getAvailability(["primary", "hope.edu_o690hqvkppqk3mdp1d3chssptk@group.calendar.google.com"], 'name@hope.edu', '2022-03-21', '09:30', '30', '240', '60');
 }
 
 function getAvailability(myIds, theirId, date, time, length, minMinutesFromNow, maxDaysFromNow, daysToExclude) {
@@ -113,7 +113,7 @@ function getAvailability(myIds, theirId, date, time, length, minMinutesFromNow, 
 
   eval(getLuxon_());
 
-  let myTimezone = Calendar.Calendars.get(myIds[0]).timeZone;
+  const myTimezone = getCalendar(myIds[0]).timeZone;
 
   let now = luxon.DateTime.now();
   let start = luxon.DateTime.fromISO(date + 'T' + time + ':00.000').setZone(myTimezone);
@@ -155,7 +155,7 @@ function getAvailability(myIds, theirId, date, time, length, minMinutesFromNow, 
 }
 
 function testGetSuggestedTimes() {
-  console.log(JSON.stringify(getSuggestedTimes('primary', 'name@example.com', '30', '900', '09:00', '17:00', [0, 6], '240', '60'), null, 2))
+  console.log(JSON.stringify(getSuggestedTimes('primary', 'schuitema@hope.edu', '30', '900', '09:00', '17:00', [0, 6], '240', '60'), null, 2))
 }
 
 function getSuggestedTimes(myid, theirid, length, step, timeMin, timeMax, daysToExclude, minMinutesFromNow, maxDaysFromNow) {
@@ -192,7 +192,7 @@ function getSuggestedTimes(myid, theirid, length, step, timeMin, timeMax, daysTo
 
   eval(getLuxon_());
 
-  const myTimezone = Calendar.Calendars.get(myid).timeZone;
+  const myTimezone = getCalendar(myId).timeZone;
 
   let now = luxon.DateTime.now();
   let min = now.plus({"minutes": minMinutesFromNow});
@@ -252,7 +252,7 @@ function getRemoteWorkStatus(id, date, time, length) {
 
   eval(getLuxon_());
 
-  let myTimezone = Calendar.Calendars.get(id).timeZone;
+  const myTimezone = getCalendar(id).timeZone;
   let start = luxon.DateTime.fromISO(date + 'T' + time + ':00.000').setZone(myTimezone);
   let end = start.plus({"minutes": length});
   let personalEvents = Calendar.Events.list(id, {
@@ -302,7 +302,7 @@ function checkGithubReleaseVersion_() {
       break;
     case -1:
       console.warn('New version of ScheduleQuest is available! Download at https://github.com/leoherzog/ScheduleQuest/releases');
-      MailApp.sendEmail(Session.getActiveUser().getEmail(), 'Newer ScheduleQuest Available', 'You\'re using ScheduleQuest at https://script.google.com/home/projects/' + ScriptApp.getScriptId() + '/edit. That\'s awesome! Just wanted to let you know that version' + latestRelease.name + ' is now available, and you\'re currently using ' + currentVersion + '. Get the new version at https://github.com/leoherzog/ScheduleQuest/releases');
+      MailApp.sendEmail(getCalendar('primary').id, 'Newer ScheduleQuest Available', 'You\'re using ScheduleQuest at https://script.google.com/home/projects/' + ScriptApp.getScriptId() + '/edit. That\'s awesome! Just wanted to let you know that version ' + latestRelease.name + ' is now available, and you\'re currently using ' + currentVersion + '. Get the new version at https://github.com/leoherzog/ScheduleQuest/releases');
       break;
     case 1:
       console.error('Local ScheduleQuest version (' + currentVersion + ') is newer than current release on Github?');
