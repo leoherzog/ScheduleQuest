@@ -298,7 +298,7 @@ function checkGithubReleaseVersion_() {
     console.warn('Problem attempting to check for newer Github version');
     return;
   }
-  switch (compareSemver_(currentVersion, latestRelease.name)) {
+  switch (compareSemver_(currentVersion, latestRelease.tag_name)) {
     case 0:
       // console.info('ScheduleQuest is up-to-date');
       break;
