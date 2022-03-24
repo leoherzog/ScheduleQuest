@@ -144,9 +144,7 @@ function getAvailability(myIds, theirId, date, time, length, minMinutesFromNow, 
 
   let available = {"busy": Object.keys(freeBusy['calendars']).some(id => freeBusy['calendars'][id]['busy'].length)};
 
-  if (theirFreeBusy['errors']) { // might not be able to fetch theirs, and that's okay
-    available['guestBusy'] = theirFreeBusy['errors'][0]['reason'];
-  } else {
+  if (!theirFreeBusy['errors']) { // might not be able to fetch theirs, and that's okay
     available['guestBusy'] = !!theirFreeBusy['busy'].length;
   }
 
