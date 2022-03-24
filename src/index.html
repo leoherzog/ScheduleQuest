@@ -465,20 +465,24 @@
           clearInterval(lastEmailChange);
         }, 1000);
       });
-      $('#length').addEventListener('change', () => {
+      $('#length').addEventListener('input', () => {
         $('#suggestionscontainer').style.display = 'none';
         clearInterval(lastEmailChange);
         checkForSuggestions();
       });
 
       var lastTimeChange;
-      [$('#email'), $('#date'), $('#starttime'), $('#length')].forEach(x => x.addEventListener('change', () => {
+      [$('#email'), $('#date'), $('#starttime')].forEach(x => x.addEventListener('change', () => {
         clearInterval(lastTimeChange);
         lastTimeChange = setInterval(() => {
           validateDateAndTime();
           clearInterval(lastTimeChange);
         }, 1000);
       }));
+      $('#length').addEventListener('input', () => {
+        clearInterval(lastTimeChange);
+        validateDateAndTime();
+      });
       
       $('#virtual').addEventListener('change', (event) => {
         if (event.currentTarget.checked) {
