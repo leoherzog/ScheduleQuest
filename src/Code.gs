@@ -289,7 +289,7 @@ function getLuxon_() {
 }
 
 function checkGithubReleaseVersion_() {
-  let currentVersion = 'v0.1';
+  let currentVersion = 'v0.1.1';
   let latestRelease;
   try {
     latestRelease = JSON.parse(UrlFetchApp.fetch('https://api.github.com/repos/leoherzog/ScheduleQuest/releases/latest').getContentText());
