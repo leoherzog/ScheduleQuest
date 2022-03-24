@@ -420,7 +420,7 @@
     function confirmSchedule(details) {
       $('#submit').disabled = false;
       $('#submit').removeAttribute('aria-busy');
-      $('#modaltitle').innerText = '<span class="fa-solid fa-calendar-check"></span> Event scheduled!';
+      $('#modaltitle').innerHTML = '<span class="fa-solid fa-calendar-check"></span> Event scheduled!';
       $('#modaltext').innerText = 'Thanks for signing up. Check your email for confirmation!';
       $('#seeEvent').style.display = 'inline';
       $('#seeEvent').href = details.htmlLink;
@@ -430,7 +430,7 @@
     function errorScheduling(error) {
       $('#submit').disabled = false;
       $('#submit').removeAttribute('aria-busy');
-      $('#modaltitle').innerText = '<span class="fa-solid fa-calendar-xmark"></span> Error Scheduling Event';
+      $('#modaltitle').innerHTML = '<span class="fa-solid fa-calendar-xmark"></span> Error Scheduling Event';
       $('#modaltext').innerText = 'Sorry, a problem came up while scheduling your event: ' + error.message;
       $('#seeEvent').style.display = 'none';
       $('#seeEvent').href = '';
