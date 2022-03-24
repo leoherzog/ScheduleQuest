@@ -158,9 +158,9 @@ function testGetSuggestedTimes() {
   console.log(JSON.stringify(getSuggestedTimes('primary', 'schuitema@hope.edu', '30', '900', '09:00', '17:00', [0, 6], '240', '60'), null, 2))
 }
 
-function getSuggestedTimes(myid, theirid, length, step, timeMin, timeMax, daysToExclude, minMinutesFromNow, maxDaysFromNow) {
+function getSuggestedTimes(myId, theirId, length, step, timeMin, timeMax, daysToExclude, minMinutesFromNow, maxDaysFromNow) {
 
-  if (!theirid || !/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(theirid)) throw 'Invalid email'; // emailregex.com
+  if (!theirId || !/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(theirId)) throw 'Invalid email'; // emailregex.com
 
   if (!length) throw 'Length is not a valid number';
   if (typeof length !== "number") {
@@ -203,12 +203,12 @@ function getSuggestedTimes(myid, theirid, length, step, timeMin, timeMax, daysTo
     "timeMax": max.toISO(),
     "timeZone": myTimezone,
     "items": [
-      {"id": myid},
-      {"id": theirid}
+      {"id": myId},
+      {"id": theirId}
     ]
   });
 
-  if (!freeBusy['calendars'][theirid] || freeBusy['calendars'][theirid]['errors']) throw 'Problem fetching freebusy: ' + JSON.stringify(freeBusy['calendars'][theirid]['errors']);
+  if (!freeBusy['calendars'][theirId] || freeBusy['calendars'][theirId]['errors']) throw 'Problem fetching freebusy: ' + JSON.stringify(freeBusy['calendars'][theirId]['errors']);
 
   let suggestions = [];
 
@@ -227,8 +227,8 @@ function getSuggestedTimes(myid, theirid, length, step, timeMin, timeMax, daysTo
     if (daysToExclude.includes(nextStep.weekday === 7 ? 0 : nextStep.weekday)) continue; // occurs on day to exclude. luxon sunday is 7, not 0
 
     let timerange = luxon.Interval.fromDateTimes(nextStep, end);
-    if (freeBusy['calendars'][myid]['busy'].some(busy => timerange.overlaps(luxon.Interval.fromISO(busy['start'] + '/' + busy['end'])))) continue; // busy on mine
-    if (freeBusy['calendars'][theirid]['busy'].some(busy => timerange.overlaps(luxon.Interval.fromISO(busy['start'] + '/' + busy['end'])))) continue; // busy on theirs
+    if (freeBusy['calendars'][myId]['busy'].some(busy => timerange.overlaps(luxon.Interval.fromISO(busy['start'] + '/' + busy['end'])))) continue; // busy on mine
+    if (freeBusy['calendars'][theirId]['busy'].some(busy => timerange.overlaps(luxon.Interval.fromISO(busy['start'] + '/' + busy['end'])))) continue; // busy on theirs
     
     suggestions.push(nextStep);
     
@@ -287,7 +287,7 @@ function getLuxon_() {
 }
 
 function checkGithubReleaseVersion_() {
-  let currentVersion = 'v0.1.1';
+  let currentVersion = 'v0.1.2';
   let latestRelease;
   try {
     latestRelease = JSON.parse(UrlFetchApp.fetch('https://api.github.com/repos/leoherzog/ScheduleQuest/releases/latest').getContentText());
