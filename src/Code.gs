@@ -300,11 +300,11 @@ function checkGithubReleaseVersion_() {
     case 0:
       // console.info('ScheduleQuest is up-to-date');
       break;
-    case -1:
+    case 1:
       console.warn('New version of ScheduleQuest is available! Download at https://github.com/leoherzog/ScheduleQuest/releases');
       MailApp.sendEmail(getCalendar('primary').id, 'Newer ScheduleQuest Available', 'You\'re using ScheduleQuest at https://script.google.com/home/projects/' + ScriptApp.getScriptId() + '/edit. That\'s awesome! Just wanted to let you know that version ' + latestRelease.name + ' is now available, and you\'re currently using ' + currentVersion + '. Get the new version at https://github.com/leoherzog/ScheduleQuest/releases');
       break;
-    case 1:
+    case -1:
       console.error('Local ScheduleQuest version (' + currentVersion + ') is newer than current release on Github?');
       break;
   }
