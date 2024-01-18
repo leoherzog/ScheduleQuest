@@ -4,7 +4,7 @@
 
 ## What is this?
 
- ScheduleQuest is a free, open-source web app to distribute to your recipients for scheduling with your Google Calendar, built on Google Apps Script. The Calendlys/cal.coms/YouCanBook.Mes of the world charge for the features you need, and [Google Calendar's built-in Appointment Scheduling](https://www.wired.com/story/calendly-google-calendar-appointment-schedule/) is a bit limited in customizability.
+ScheduleQuest is a free, open-source web app to distribute to your recipients for scheduling with your Google Calendar, built on Google Apps Script. The Calendlys/cal.coms/YouCanBook.Mes of the world charge for the features you need, and [Google Calendar's built-in Appointment Scheduling](https://www.wired.com/story/calendly-google-calendar-appointment-schedule/) is a bit limited in customizability.
 
 [![Scheduling a meeting in ScheduleQuest](https://github.com/leoherzog/ScheduleQuest/blob/main/img/scheduling.png?raw=true)](https://script.google.com/macros/s/AKfycbzoPACJV5edaj4BF2hNRR_izwQ7uqsqkFHOX07qZ6XEdWY_SGIGCEk4JIqtFxdB2qvg/exec)
 
@@ -59,11 +59,11 @@ Apps Script will then show you a deployment "Web App" URL that you can copy to t
       "length": [60],
 
       // minimum number of minutes from now that the meeting can be scheduled
-      "minMinutesFromNow": 240, 
+      "minMinutesFromNow": 240,
 
       // maximum number of days from now that the meeting can be scheduled
       "maxDaysFromNow": 90,
-      
+
       // minimum time each day that the meeting can be scheduled
       "timeMin": "09:00",
 
@@ -74,7 +74,7 @@ Apps Script will then show you a deployment "Web App" URL that you can copy to t
       "timeStep": 1800,
 
       // array of days of the week to exclude from scheduling. 0 is Sunday, 6 is Saturday.
-      "daysToExclude": [0, 6], 
+      "daysToExclude": [0, 6],
 
       // label for the title field
       "titleLabel": "Your Name",
@@ -104,7 +104,7 @@ Apps Script will then show you a deployment "Web App" URL that you can copy to t
       "descriptionLabel": "Description",
 
       // the description of the event
-      "description": "Chatting with you to get to know your needs and to show you our product.", 
+      "description": "Chatting with you to get to know your needs and to show you our product.",
 
       // whether the description field is editable
       "descriptionReadOnly": false,
@@ -132,10 +132,11 @@ Example:
 
 ```html
 <style>
-  :root[data-theme="light"], :root[data-theme="dark"] {
-    --primary: #DB4437; /* google red */
-    --primary-hover: #BD2E22; /* 10% darker */
-    --primary-focus: #BD2E22; 
+  :root[data-theme='light'],
+  :root[data-theme='dark'] {
+    --primary: #db4437; /* google red */
+    --primary-hover: #bd2e22; /* 10% darker */
+    --primary-focus: #bd2e22;
   }
 </style>
 ```
@@ -161,6 +162,7 @@ Example:
   <img src="https://herzog.tech/signature/anchor.svg.png" width="32px" />
 </a>
 <br />
-<a href="https://www.buymeacoffee.com/leoherzog" target="_blank">
-  <img src="https://cdn.buymeacoffee.com/buttons/lato-black.png" alt="Buy Me A Coffee" width="217px" />
+<a href="https://herzog.tech/$" target="_blank">
+  <img src="https://herzog.tech/signature/mug-tea-saucer-solid.svg.png" alt="Buy Me A Coffee" width="32px" />
+  Found this helpful? Buy me a tea!
 </a>
